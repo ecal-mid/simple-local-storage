@@ -26,7 +26,8 @@ const app = express();
 const server = app.listen(CONFIG.port, CONFIG.host, () => {
     const { address, port } = server.address()
     PATH = new Path({ address, port })
-    console.log(`Running on ${PATH.getServerPath()}`)
+    console.log(`Server: ${PATH.getServerPath()}`)
+    console.log(`Example: ${PATH.getServerPath('example')}`)
 })
 
 if (CONFIG.cors === true)
