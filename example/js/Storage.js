@@ -1,45 +1,81 @@
-export default class Storage {
+class Storage {
     constructor(params = {}) {
 
+        if (typeof params === 'string')
+            params = { path: params }
+
         this.params = {
-            root: window.location.origin,
+            origin: window.location.origin,
+            path: '/',
             ...params
         }
     }
 
-    sanitize(path) {
-        return new URL(path, this.params.root)
+    getFullURL(path) {
+        const url = new URL(path, this.params.origin)
+        url.pathname = this.getFullPath([this.params.path, url.pathname])
+        return url
+    }
+
+    getFullPath(paths) {
+        const fullPath = paths
+            .filter(Boolean)
+            .map(path => String(path).replace(/^\/|\/$/g, ''))
+            .filter(Boolean)
+            .join('/')
+
+        return fullPath
+    }
+
+    async fetch(path, ...args) {
+        const url = this.getFullURL(path)
+        return fetch(url, ...args)
     }
 
     async list(path = '/') {
-        const url = this.sanitize(path)
-        return await fetch(url).then(resp => resp.json())
+        return await this.fetch(path).then(resp => resp.json()).catch(e => { })
     }
 
-    async upload(filePath, data) {
-
+    splitFilePath(filePath) {
         const sections = filePath.split('/').filter(Boolean)
         const fileName = sections.pop()
         const path = sections.join('/')
 
-        const url = this.sanitize(path)
+        const matchImage = fileName.match(/\.(jpe?g|png|gif|bmp)$/i)
+        const type = matchImage ? `image/${matchImage[1]}` : undefined
 
-        const formData = new FormData();
+        return { fileName, path, type }
+    }
+
+    async upload(filePath, data) {
+
+        const { path, fileName, type } = this.splitFilePath(filePath)
+
+        const formData = new FormData()
 
         if (data instanceof Image) {
             const blob = await this.imageToBlob(data)
-            formData.append('file', blob, fileName);
+            formData.append('file', blob, fileName)
         } else if (data instanceof HTMLCanvasElement) {
-            const blob = await this.canvasToBlob(data)
-            formData.append('file', blob, fileName);
-            return
+            const blob = await this.canvasToBlob(data, { type })
+            formData.append('file', blob, fileName)
         } else if (data instanceof Blob) {
-            formData.append('file', data, fileName);
+            formData.append('file', data, fileName)
+        } else if (typeof data === 'string') {
+            const blob = this.stringToBlob(data)
+            formData.append('file', blob, fileName)
+        } else if (typeof data === 'object' && fileName.endsWith('.json')) {
+            const blob = this.stringToBlob(JSON.stringify(data), { type: 'application/json' })
+            formData.append('file', blob, fileName)
         }
 
-        return await fetch(url, {
+        return await this.fetch(path, {
             body: formData, method: 'post',
-        }).then(e => e.text());
+        }).then(e => e.text())
+    }
+
+    stringToBlob(string, options) {
+        return new Blob([string], { type: 'text/plain', ...options })
     }
 
     async imageToBlob(image) {
@@ -49,26 +85,14 @@ export default class Storage {
         })
 
         const canvas = document.createElement('canvas')
-        canvas.width = image.width;     // update canvas size to match image
-        canvas.height = image.height;
-        canvas.getContext('2d').drawImage(image, 0, 0);       // draw in image
+        canvas.width = image.width
+        canvas.height = image.height
+        canvas.getContext('2d').drawImage(image, 0, 0)
 
         return await this.canvasToBlob(canvas)
     }
 
-    async canvasToBlob(canvas) {
-        return new Promise(resolve => canvas.toBlob(resolve))
+    async canvasToBlob(canvas, { type = 'image/png', quality } = {}) {
+        return new Promise(resolve => canvas.toBlob(resolve, type, quality))
     }
-
-    // uploadCanvas(path, canvas) {
-
-    //     const blob = await new Promise(resolve => canvas.toBlob(resolve))
-
-    //     const formData = new FormData();
-    //     formData.append('file', blob, '');
-
-    //     const resp = await fetch('/fuck/this', {
-    //         body: formData, method: 'post',
-    //     }).then(e => e.text());
-    // }
 }
