@@ -80,6 +80,8 @@ class Storage {
 
     async imageToBlob(image) {
 
+        image.crossOrigin = ''
+
         if (!image.complete) await new Promise(resolve => {
             image.addEventListener('load', resolve, { once: true })
         })
