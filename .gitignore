@@ -133,4 +133,5 @@ dist
 *.DS_Store
 
 # app
-public/
+public/*
+!public/.gitkeep
