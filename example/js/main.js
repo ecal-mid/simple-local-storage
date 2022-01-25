@@ -1,31 +1,43 @@
+import Storage from './Storage.js'
+
 (async () => {
-    const canvas = document.querySelector('#main-canvas');
-    const ctx = canvas.getContext('2d')
-    const resp = await fetch('/', { method: 'get' }).then(resp => resp.json())
 
-    const image = new Image()
+    const storage = new Storage()
+    const list = await storage.list('/')
 
-    image.onload = (event) => {
-        canvas.width = image.width
-        canvas.height = image.height
-        ctx.drawImage(image, 0, 0)
+    console.log(list)
+    // const img = new Image()
+    // img.src = '/lol.png'
 
-        canvas.toBlob(async (blob) => {
-            console.log(blob)
-            // console.log(blob.type)
-            const formData = new FormData();
-            formData.append('file', blob, '');
-            // console.log(blob)
-            const resp = await fetch('/fuck/this', {
-                body: formData, method: 'post',
-            }).then(e => e.text());
-            // console.log(resp)
-            // console.log(formData.getAll('my-file'))
-        });
-    }
+    // const uploaded = await storage.upload('name2.png', img)
 
-    image.crossOrigin = "Anonymous"; //! important header
-    image.src = resp.find(r => r.isFile).url
+    // const canvas = document.querySelector('#main-canvas');
+    // const ctx = canvas.getContext('2d')
+    // const resp = await fetch('/').then(resp => resp.json())
+
+    // const image = new Image()
+
+    // image.onload = (event) => {
+    //     canvas.width = image.width
+    //     canvas.height = image.height
+    //     ctx.drawImage(image, 0, 0)
+
+    //     canvas.toBlob(async (blob) => {
+    //         console.log(blob)
+    //         // console.log(blob.type)
+    //         const formData = new FormData();
+    //         formData.append('file', blob, '');
+    //         // console.log(blob)
+    //         const resp = await fetch('/fuck/this', {
+    //             body: formData, method: 'post',
+    //         }).then(e => e.text());
+    //         // console.log(resp)
+    //         // console.log(formData.getAll('my-file'))
+    //     });
+    // }
+
+    // image.crossOrigin = "Anonymous"; //! important header
+    // image.src = resp.find(r => r.isFile).url
 
 
     // var input = document.querySelector('input[type="file"]')
