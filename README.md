@@ -22,7 +22,7 @@ const storage = new Storage('myDatabaseName')
 ### list directory
 ```javascript
 const list = await storage.list('/')
-console.log(list)
+console.log(list) // [{ url, name, isFile }, ...]
 ```
 ### upload files
 ```javascript
