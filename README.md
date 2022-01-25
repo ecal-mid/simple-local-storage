@@ -9,9 +9,11 @@ Simple node.js server to share and save files via http
 1. `npm run start`
 
 ## Storage.js
-Refer to the `example/` code
+```
+⭐️ Refer to the folder `example`
+```
 
-### init storage
+### init the store
 Make sure to set the correct origin of the server (Shown in the terminal if the server is running)
 ```javascript
 const storage = new Storage('myDatabaseName')
