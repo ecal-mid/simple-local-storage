@@ -33,3 +33,5 @@ await storage.upload('myText.txt', 'hello')
 await storage.upload('myFolder/myImage.png', 'https://picsum.photos/id/237/200/300') // creates folder "myFolder" if inexistant
 await storage.upload('myJson.json', { hello: "world" }) //json
 ```
+## TODO
+- Integrate a `delete method
