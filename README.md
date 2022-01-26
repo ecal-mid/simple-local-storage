@@ -19,7 +19,7 @@ Make sure to set the correct origin of the server (Shown in the terminal if the 
 const storage = new Storage('myDatabaseName')
 // or
 const storage = new Storage({ path: 'myDatabaseName' })
-// or
+// or run with an external database (external localhost)
 const storage = new Storage({ origin: 'http://localhost:1080', path: 'myDatabaseName' })
 ```
 ### list directory
