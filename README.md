@@ -34,4 +34,4 @@ await storage.upload('myFolder/myImage.png', 'https://picsum.photos/id/237/200/3
 await storage.upload('myJson.json', { hello: "world" }) //json
 ```
 ## TODO
-- Integrate a `delete method
+- Integrate a `delete` method
