@@ -97,4 +97,8 @@ class Storage {
     async canvasToBlob(canvas, { type = 'image/png', quality } = {}) {
         return new Promise(resolve => canvas.toBlob(resolve, type, quality))
     }
+
+    async delete(path = '') {
+        return await this.fetch(path, { method: 'delete' }).then(e => e.text())
+    }
 }

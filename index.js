@@ -1,11 +1,11 @@
-import express from 'express';
+import express from 'express'
 import cors from 'cors'
 import { promises as fs } from 'fs'
-import formidable from 'formidable';
+import formidable from 'formidable'
 import minimist from 'minimist'
-import { Path } from './utils.js';
+import { Path } from './utils.js'
 
-let PATH;
+let PATH
 
 const CONFIG = {
     port: 1080,
@@ -21,7 +21,7 @@ const CONFIG = {
     })
 }
 
-const app = express();
+const app = express()
 
 const server = app.listen(CONFIG.port, CONFIG.host, () => {
     const { address, port } = server.address()
@@ -33,9 +33,9 @@ const server = app.listen(CONFIG.port, CONFIG.host, () => {
 if (CONFIG.cors === true)
     app.use(cors())
 
-app.use('/', express.static(CONFIG.folder));
+app.use('/', express.static(CONFIG.folder))
 
-app.use('/example', express.static('example'));
+app.use('/example', express.static('example'))
 
 app.get('/*', (request, response, next) => {
 
@@ -63,21 +63,21 @@ app.get('/*', (request, response, next) => {
         response.send(directory)
 
     }).catch((err) => {
-        response.sendStatus(404);
+        response.sendStatus(404)
     })
-});
+})
 
 app.post('/*', async (request, response) => {
 
-    await fs.mkdir(PATH.getAbsolutePath(CONFIG.folder, request.path), { recursive: true });
+    await fs.mkdir(PATH.getAbsolutePath(CONFIG.folder, request.path), { recursive: true })
     const form = formidable({
         keepExtensions: true
-    });
+    })
 
     form.parse(request, (err, fields, files) => {
         if (err) {
             response.sendStatus(404)
-            return;
+            return
         }
         let msg = ''
 
@@ -86,7 +86,7 @@ app.post('/*', async (request, response) => {
             msg = `Successfully saved ${names.join(', ')}`
 
         response.send(msg)
-    });
+    })
 
     form.on("fileBegin", (name, file) => {
         const fileName = file.originalFilename
@@ -95,5 +95,18 @@ app.post('/*', async (request, response) => {
 
         file.filepath = PATH.getRelativePath(CONFIG.folder, request.path, fileName)
         file.newFilename = fileName
-    });
-});
+    })
+})
+
+app.delete('/*', async (request, response) => {
+    const { pathname } = PATH.getAbsolutePath(CONFIG.folder, request.path)
+
+    try {
+        const lol = await fs.rm(pathname, { recursive: true, force: true })
+        response.send("success")
+    } catch (e) {
+        console.log(e)
+        response.sendStatus(404)
+    }
+
+})
