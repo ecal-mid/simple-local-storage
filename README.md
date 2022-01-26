@@ -10,7 +10,7 @@ Simple node.js server to share and save files via http
 
 ## Storage.js
 ```
-⭐️ Refer to the folder `example`
+⭐️ Refer to the folder "example"
 ```
 
 ### init the store
